@@ -1,0 +1,13 @@
+{
+	"Id": "ModEnsemble",
+	"DisplayName": "ModEnsemble",
+	"Title": "ModEnsemble",
+	"Author": "dkoiman",
+	"ModURL": "https://github.com/dkoiman/ModEnsemble",
+	"Version": "0.0.2",
+	"ManagerVersion": "0.25.0",
+	"GameVersion": "0.3.26",
+	"Description": "Alternative template loader and utility library",
+	"AssemblyName": "ModEnsemble.dll",
+	"EntryMethod": "ModEnsemble.Main.Load"
+}
