@@ -55,8 +55,10 @@ namespace ModEnsemble {
             ModHook_ManualTemplateRegistration();
         }
 
-        private void Reset(string templatePath) {
-            TemplateManager.ClearAllTemplates();
+        private void Reload(string templatePath, bool soft = false) {
+            if (!soft) {
+                TemplateManager.ClearAllTemplates();
+            }
             templates.Clear();
             types.Clear();
             typeExtensions.Clear();
@@ -166,11 +168,11 @@ namespace ModEnsemble {
         public void ModHook_InCodeTemplateOverride() { }
 
         public static void Reset() {
-            self.Reset(Application.streamingAssetsPath + Utilities.templateFolder);
+            self.Reload(Application.streamingAssetsPath + Utilities.templateFolder, false);
         }
 
         public static void Reload() {
-            self.LoadImpl();
+            self.Reload(Application.streamingAssetsPath + Utilities.templateFolder, true);
         }
 
         public static void RegisterTemplateExtension(string baseType, System.Type extension) {

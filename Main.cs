@@ -2,6 +2,7 @@
 
 using HarmonyLib;
 using UnityModManagerNet;
+using UnityEngine;
 
 using ModEnsemble.Library;
 
@@ -16,6 +17,7 @@ namespace ModEnsemble {
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             mod = modEntry;
             modEntry.OnToggle = OnToggle;
+            modEntry.OnGUI = OnGUI;
 
             // Configure mod compoenents
             VLog.logLevel = 0;
@@ -26,6 +28,18 @@ namespace ModEnsemble {
         static bool OnToggle(UnityModManager.ModEntry modEntry, bool value) {
             enabled = value;
             return true;
+        }
+
+        static void OnGUI(UnityModManager.ModEntry modEntry) {
+            GUILayout.Space(5);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Soft-reload templates")) {
+                AlternateTemplateLoadManager.Reload();
+            }
+            if (GUILayout.Button("Hard-reload templates (may cause crash)")) {
+                AlternateTemplateLoadManager.Reset();
+            }
+            GUILayout.EndHorizontal();
         }
     }
 }
