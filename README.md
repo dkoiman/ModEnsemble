@@ -13,6 +13,7 @@ content. All rights for the content of the files belong to Pavonics Interactive.
 
 ## IMPORTANT: Installation notes
 
+* Install [Unity Mod Manager](https://www.nexusmods.com/site/mods/21)
 * Uncheck "Use Mods" checkbox from the mod menu of the game.
 * Build the project or Download as an archive.
 * Copy `$(project_location)/Result/ModEnsemble` or archive content into
