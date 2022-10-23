@@ -7,7 +7,7 @@ Manager to function.
 
 ## IMPORTART
 
-The content of `Files/JsonFix` are minor derivatives of the original in game
+The content of `Files/JsonFixes` are minor derivatives of the original in game
 files. The author of the mode does NOT claim any authorship of the files
 content. All rights for the content of the files belong to Pavonics Interactive.
 
@@ -21,24 +21,22 @@ content. All rights for the content of the files belong to Pavonics Interactive.
 ## Features
 
 * No mangling with on-disk files - all json-mod merges happen in memory
-* Pick-up of new json-mods without game restart (see some limitations below)
+* Pick-up of new json-mods without game restart
+* * Automatically when loading save / starting new game / starting skirmish
+* * Manually at any time via mod menu (ctrl + F10)
+* * * Soft-reload attempts to patch in existing template objects.
+* * * Hard-reload recreates all the objects (and may cause crashes or
+      in-game inconsistencies. Don't use it unless you know what you are doing.
 * Allows loading non-vanilla template types without crashing
-* Some yet undocumented features for extending leaf templates
+* Allows leaf template extensions
 
 ## Limitations / Known Issues
 
-* New json-mods are picked up when one of the following happens:
-* * Initial loading of the game
-* * New Game is started
-* * Save is Loaded
-* * Transitioning to main menu from game/skirmish
-* The above means, that newly downloaded mods will not be active for "skirmish"
-  until one of the above happens.
-
-## Planned features
-* Soft-reload of the templates is already supported, but not tested or exposed
-  to be triggered. UI to trigger soft-reload will be available in 0.0.3
-* Better integration of dynamic mod load with skirmish mode.
+* stationModelResource assets are cached only once when new game, load save or
+  skirmish start are done. If subsequent template reloads introduce new
+  stationModelResource, the game won't properly pick those up.
+* As with vanilla, the game will crash if the same stationModelResource is
+  used in multiple templates.
 
 ## Feature details
 
@@ -74,6 +72,7 @@ their extension with "_".
 ```C#
 namespace SomeMod {
 
+    // Registering arbitrary named json files.
     [HarmonyPatch(typeof(AlternateTemplateLoadManager), "ModHook_ManualTemplateRegistration")]
     class Loader {
         public static void Prefix() {
@@ -84,6 +83,58 @@ namespace SomeMod {
                 Main.mod.Path + "Templates/MissilesBatch1.json_",
                 Main.mod.Path + "Templates/MissilesBatch2.json_" };
             AlternateTemplateLoadManager.Register(template);
+        }
+    }
+
+    // In-code template override. New templates can also be added here to
+    // TemplateManager safely at this point.
+    [HarmonyPatch(typeof(AlternateTemplateLoadManager), "ModHook_InCodeTemplateOverride")]
+    class Loader {
+        public static void Prefix() {
+            TILaserWeaponTemplate template =
+                TemplateManager.Find<TILaserWeaponTemplate>("PointDefenseLaserTurret");
+            if (template == null) {
+                return;
+            }
+            template.targetingRange_km = 1337;
+        }
+    }
+}
+```
+
+## Leaf template extension
+
+AlternateTemplateLoadManager provides a way to extend the leaf templates. It
+particularly may be useful to define extra parameters attached to a specific
+entity type (say, PD evasion chance for a missile). To do so, one needs to
+intercept `ModHook_ManualTemplateRegistration` and register an extending
+template type. The extending template type must inherit the base template type
+and reside in global namespace.
+
+NOTE: The merger will match tempaltes based on the original file name for
+`*.json` files or based on the supplied type during manual template. The base
+type should be used in those cases, not extending one.
+
+NOTE: You can only extend leaf templates in such a way. If the base template
+has child template types, they won't inherit the extended fields.
+
+``` C#
+
+class TIAdvMissileTemplate : TIMissileTemplate {
+	public float base_evasion_chance = 0.8f;
+}
+
+namespace YourModNamespace {
+    [HarmonyPatch(typeof(AlternateTemplateLoadManager), "ModHook_ManualTemplateRegistration")]
+    class Loader {
+        public static void Prefix() {
+            ModTemplate template = new ModTemplate();
+            template.typeName = "TIMissileTemplate";
+            template.modName = "AdvancedMissiles";
+            template.jsonFiles = new string[] { Main.mod.Path + "TIAdvMissileTemplate.json_" };
+            AlternateTemplateLoadManager.Register(template);
+		AlternateTemplateLoadManager.RegisterTemplateExtension(
+			"TIMissileTemplate", typeof(TIAdvMissileTemplate));
         }
     }
 }

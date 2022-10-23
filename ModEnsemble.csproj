@@ -87,11 +87,11 @@
   <PropertyGroup>
     <PostBuildEvent>rmdir $(ProjectDir)Result /s /q
 mkdir $(ProjectDir)Result
-mkdir $(ProjectDir)Result\ModEnsemble
-xcopy  /E /Y $(ProjectDir)Files $(ProjectDir)Result\ModEnsemble
-xcopy $(TargetPath) $(ProjectDir)Result\ModEnsemble
-rmdir "C:\Program Files (x86)\Steam\steamapps\common\Terra Invicta\Mods\Enabled\ModEnsemble" /s /q
-mkdir "C:\Program Files (x86)\Steam\steamapps\common\Terra Invicta\Mods\Enabled\ModEnsemble"
-xcopy /E /Y $(ProjectDir)Result\ModEnsemble "C:\Program Files (x86)\Steam\steamapps\common\Terra Invicta\Mods\Enabled\ModEnsemble"</PostBuildEvent>
+mkdir $(ProjectDir)Result\$(ProjectName)
+xcopy  /E /Y $(ProjectDir)Files $(ProjectDir)Result\$(ProjectName)
+xcopy $(TargetPath) $(ProjectDir)Result\$(ProjectName)
+rmdir "C:\Program Files (x86)\Steam\steamapps\common\Terra Invicta\Mods\Enabled\$(ProjectName)" /s /q
+mkdir "C:\Program Files (x86)\Steam\steamapps\common\Terra Invicta\Mods\Enabled\$(ProjectName)"
+xcopy /E /Y $(ProjectDir)Result\$(ProjectName) "C:\Program Files (x86)\Steam\steamapps\common\Terra Invicta\Mods\Enabled\$(ProjectName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
