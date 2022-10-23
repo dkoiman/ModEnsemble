@@ -32,22 +32,6 @@ namespace ModEnsemble {
 
         public const string kVanilaId = "___V_A_N_I_L_A___";
 
-        AlternateTemplateLoadManager() {
-            FixVanilaJson(Application.streamingAssetsPath + Utilities.templateFolder);
-        }
-
-        // Some Vanila Json files are malformed, so we have to fix them to load correctly.
-        private void FixVanilaJson(string templatePath) {
-            File.Copy(
-                "Mods/Enabled/ModEnsemble/JsonFixes/TIMapGroupVisualizerTemplate.json_",
-                templatePath + "/TIMapGroupVisualizerTemplate.json",
-                true);
-            File.Copy(
-                "Mods/Enabled/ModEnsemble/JsonFixes/TISpaceFleetTemplate.json_",
-                templatePath + "/TISpaceFleetTemplate.json",
-                true);
-        }
-
         private void Initialize(string templatePath) {
             VLog.Debug(VLog.Level.VLOG_1, "Initializing AlternateTemplateManager");
             RegisterVanilaTemplates(templatePath);
@@ -90,7 +74,15 @@ namespace ModEnsemble {
                 ModTemplate template = new ModTemplate();
                 template.typeName = System.IO.Path.GetFileNameWithoutExtension(file);
                 template.modName = kVanilaId;
-                template.jsonFiles = new string[] { file };
+
+                // Some Vanila Json files are malformed, so we have to fix them to load correctly.
+                if (template.typeName == "TIMapGroupVisualizerTemplate") {
+                    template.jsonFiles = new string[] { "Mods/Enabled/ModEnsemble/JsonFixes/TIMapGroupVisualizerTemplate.json_" };
+                } else if (template.typeName == "TISpaceFleetTemplate") {
+                    template.jsonFiles = new string[] { "Mods/Enabled/ModEnsemble/JsonFixes/TISpaceFleetTemplate.json_" };
+                } else {
+                    template.jsonFiles = new string[] { file };
+                }
                 RegisterImpl(template);
             }
         }
