@@ -14,6 +14,14 @@ namespace ModEnsemble.Library.Internal {
         }
     }
 
+    [HarmonyPatch(typeof(StartMenuController), "OnStartSkirmishModeClicked")]
+    static class ReloadWhenEnteringSkirmish {
+        static void Prefix() {
+            VLog.Debug(VLog.Level.VLOG_1, "Reload templates for skirmish");
+            AlternateTemplateLoadManager.Reset();
+        }
+    }
+
     // Resolve extended classes localization to the base one, if not resolved already.
     [HarmonyPatch(typeof(Loc), "T", new System.Type[] { typeof(string) })]
     static class LocalizationPatch {
